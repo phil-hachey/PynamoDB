@@ -1249,7 +1249,17 @@ class Model(AttributeContainer):
         A helper object that contains meta data about this table
         """
         if cls._meta_table is None:
-            cls._meta_table = MetaTable(cls._get_connection().describe_table())
+            cls._meta_table = MetaTable()
+            cls._meta_table._range_keyname = None
+            for key, attr in cls._attributes.iteritems():
+                if attr.is_hash_key:
+                    cls._meta_table._hash_keyname = key
+                elif attr.is_range_key:
+                    cls._meta_table._range_keyname = key
+
+        # cls._meta_table.data = {
+        #     'AttributeDefinitions': {}
+        # }
         return cls._meta_table
 
     @classmethod
